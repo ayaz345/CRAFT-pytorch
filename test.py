@@ -29,10 +29,7 @@ from craft import CRAFT
 
 from collections import OrderedDict
 def copyStateDict(state_dict):
-    if list(state_dict.keys())[0].startswith("module"):
-        start_idx = 1
-    else:
-        start_idx = 0
+    start_idx = 1 if list(state_dict.keys())[0].startswith("module") else 0
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():
         name = ".".join(k.split(".")[start_idx:])
@@ -123,7 +120,7 @@ if __name__ == '__main__':
     # load net
     net = CRAFT()     # initialize
 
-    print('Loading weights from checkpoint (' + args.trained_model + ')')
+    print(f'Loading weights from checkpoint ({args.trained_model})')
     if args.cuda:
         net.load_state_dict(copyStateDict(torch.load(args.trained_model)))
     else:
@@ -141,7 +138,7 @@ if __name__ == '__main__':
     if args.refine:
         from refinenet import RefineNet
         refine_net = RefineNet()
-        print('Loading weights of refiner from checkpoint (' + args.refiner_model + ')')
+        print(f'Loading weights of refiner from checkpoint ({args.refiner_model})')
         if args.cuda:
             refine_net.load_state_dict(copyStateDict(torch.load(args.refiner_model)))
             refine_net = refine_net.cuda()
@@ -163,9 +160,9 @@ if __name__ == '__main__':
 
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
-        mask_file = result_folder + "/res_" + filename + '_mask.jpg'
+        mask_file = f"{result_folder}/res_{filename}_mask.jpg"
         cv2.imwrite(mask_file, score_text)
 
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 
-    print("elapsed time : {}s".format(time.time() - t))
+    print(f"elapsed time : {time.time() - t}s")
